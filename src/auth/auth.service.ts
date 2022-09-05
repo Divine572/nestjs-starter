@@ -31,7 +31,7 @@ export class AuthService {
     }
   }
 
-  async getAuthenticatedUser(email: string, password: string) {
+  async login(email: string, password: string) {
     try {
       const user = await this.usersService.getByEmail(email);
       await this.verifyPassword(password, user.password);
