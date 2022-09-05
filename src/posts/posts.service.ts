@@ -9,9 +9,6 @@ import { Repository } from 'typeorm';
 export default class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
 
-  private lastPostId = 0;
-  private posts: Post[] = [];
-
   getAllPosts() {
     return this.repo.find();
   }
