@@ -25,7 +25,9 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: RequestWithUser) {
     const user = req.user;
+    const cookie = this.authService.getCookieWithJwtToken(user.id);
+    req.res.setHeader('Set-Cookie', cookie);
     user.password = undefined;
-    return user;
+    return req.res.send(user);
   }
 }

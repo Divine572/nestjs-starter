@@ -8,6 +8,21 @@ import User from './user.entity';
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
+  async getById(id: number) {
+    const user = await this.repo.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException(
+        'User with this id does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return user;
+  }
+
   async getByEmail(email: string) {
     const user = await this.repo.findOne({
       where: {
