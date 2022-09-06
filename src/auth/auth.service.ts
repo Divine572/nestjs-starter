@@ -34,7 +34,6 @@ export class AuthService {
         ...registrationData,
         password: hashedPassword,
       });
-      createdUser.password = undefined;
       return createdUser;
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
@@ -54,7 +53,6 @@ export class AuthService {
     try {
       const user = await this.usersService.getByEmail(email);
       await this.verifyPassword(password, user.password);
-      user.password = undefined;
       return user;
     } catch (error) {
       throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);

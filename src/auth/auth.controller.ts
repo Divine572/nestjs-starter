@@ -29,7 +29,6 @@ export class AuthController {
     const user = req.user;
     const cookie = this.authService.getCookieWithJwtToken(user.id);
     req.res.setHeader('Set-Cookie', cookie);
-    user.password = undefined;
     return req.res.send(user);
   }
 
@@ -44,7 +43,6 @@ export class AuthController {
   @Get()
   async me(@Req() req: RequestWithUser) {
     const user = req.user;
-    user.password = undefined;
     return req.res.send(user);
   }
 }

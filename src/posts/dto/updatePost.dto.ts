@@ -1,6 +1,12 @@
+import { IsOptional, IsString } from "class-validator";
+
 export class UpdatePostDto {
-  id: number;
+  @IsString()
+  @IsOptional()
   content: string;
+
+  @IsString()
+  @IsOptional()
   title: string;
 }
 
