@@ -23,6 +23,10 @@ export class AuthService {
     )}`;
   }
 
+  getCookieForLogout() {
+    return 'Authentication=; HttpOnly; Path=/; Max-Age=0;';
+  }
+
   async register(registrationData: RegistrationDto) {
     const hashedPassword = await bcrypt.hash(registrationData.password, 10);
     try {
