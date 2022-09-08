@@ -29,20 +29,19 @@ export class AuthController {
     const user = req.user;
     const cookie = this.authService.getCookieWithJwtToken(user.id);
     req.res.setHeader('Set-Cookie', cookie);
-    return req.res.send(user);
+    return user;
   }
 
+  @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Req() req: RequestWithUser) {
     req.res.setHeader('Set-Cookie', this.authService.getCookieForLogout());
-    return req.res.sendStatus(200);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
   async me(@Req() req: RequestWithUser) {
-    const user = req.user;
-    return req.res.send(user);
+    return req.user;
   }
 }
