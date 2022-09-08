@@ -12,8 +12,11 @@ import PostsService from './posts.service';
 import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
 import JwtAuthGuard from '../auth/jwtAuth.guard';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import PostDto from './dto/post.dto';
 
 @Controller('posts')
+@Serialize(PostDto)
 export default class PostsController {
   constructor(private readonly postsService: PostsService) {}
 

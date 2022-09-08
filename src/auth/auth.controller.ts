@@ -7,13 +7,17 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import User from '../users/user.entity';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { RegistrationDto } from './dto/registration.dto';
 import JwtAuthGuard from './jwtAuth.guard';
 import { LocalAuthGuard } from './localAuth.guard';
 import RequestWithUser from './requestWithUser.interface';
+import { UserDto } from '../users/dto/user.dto';
 
 @Controller('auth')
+@Serialize(UserDto)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
