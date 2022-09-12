@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import PostsService from './posts.service';
@@ -14,6 +15,7 @@ import UpdatePostDto from './dto/updatePost.dto';
 import JwtAuthGuard from '../auth/jwtAuth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import PostDto from './dto/post.dto';
+import RequestWithUser from '../auth/requestWithUser.interface';
 
 @Controller('posts')
 @Serialize(PostDto)
@@ -32,8 +34,8 @@ export default class PostsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async createPost(@Body() post: CreatePostDto) {
-    return this.postsService.createPost(post);
+  async createPost(@Body() post: CreatePostDto, @Req() req: RequestWithUser) {
+    return this.postsService.createPost(post, req.user);
   }
 
   @Put(':id')

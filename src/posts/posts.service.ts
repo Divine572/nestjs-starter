@@ -1,23 +1,31 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import Post from './post.entity';
 import { Repository } from 'typeorm';
 import { PostNotFoundException } from './exception/postNotFound.exception';
+import User from '../users/user.entity';
 
 @Injectable()
 export default class PostsService {
   constructor(@InjectRepository(Post) private repo: Repository<Post>) {}
 
   getAllPosts() {
-    return this.repo.find();
+    return this.repo.find({
+      relations: {
+        author: true,
+      },
+    });
   }
 
   getPostById(id: number) {
     const post = this.repo.findOne({
       where: {
         id,
+      },
+      relations: {
+        author: true,
       },
     });
     if (!post) {
@@ -31,6 +39,9 @@ export default class PostsService {
       where: {
         id,
       },
+      relations: {
+        author: true,
+      },
     });
     if (!updatedPost) {
       throw new PostNotFoundException(id);
@@ -39,8 +50,8 @@ export default class PostsService {
     return updatedPost;
   }
 
-  async createPost(post: CreatePostDto) {
-    const newPost = this.repo.create(post);
+  async createPost(post: CreatePostDto, user: User) {
+    const newPost = this.repo.create({ ...post, author: user });
     await this.repo.save(newPost);
     return newPost;
   }

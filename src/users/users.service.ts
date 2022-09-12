@@ -43,4 +43,8 @@ export class UsersService {
     await this.repo.save(newUser);
     return newUser;
   }
+
+  getAllAddressesWithUsers() {
+    return this.repo.find({ relations: ['user'] });
+  }
 }
