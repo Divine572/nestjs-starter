@@ -1,5 +1,12 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Address } from './address.entity';
 
 @Entity()
 export default class User {
@@ -15,4 +22,8 @@ export default class User {
 
   @Column()
   name: string;
+
+  @OneToOne(() => Address)
+  @JoinColumn()
+  address: Address;
 }
