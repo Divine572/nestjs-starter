@@ -35,7 +35,7 @@ export default class PostsService {
   }
 
   async replacePost(id: number, post: UpdatePostDto) {
-    const updatedPost = this.repo.findOne({
+    const updatedPost = await this.repo.findOne({
       where: {
         id,
       },
