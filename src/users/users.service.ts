@@ -1,12 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FilesService } from 'src/files/files.service';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/updateUserDto';
 import User from './user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private repo: Repository<User>,
+    private readonly filesService: FilesService,
+  ) {}
 
   async getById(id: number) {
     const user = await this.repo.findOne({
@@ -46,5 +50,37 @@ export class UsersService {
 
   getAllAddressesWithUsers() {
     return this.repo.find({ relations: ['user'] });
+  }
+
+  async addAvatar(userId: number, imageBuffer: Buffer, filename: string) {
+    const user = await this.getById(userId);
+    if (user.avatar) {
+      await this.repo.update(userId, {
+        ...user,
+        avatar: null,
+      });
+      await this.filesService.deletePublicFile(user.avatar.id);
+    }
+    const avatar = await this.filesService.uploadPublicFile(
+      imageBuffer,
+      filename,
+    );
+    await this.repo.update(userId, {
+      ...user,
+      avatar,
+    });
+    return avatar;
+  }
+
+  async deleteAvatar(userId: number) {
+    const user = await this.getById(userId);
+    const fileId = user.avatar?.id;
+    if (fileId) {
+      await this.repo.update(userId, {
+        ...user,
+        avatar: null,
+      });
+    }
+    await this.filesService.deletePublicFile(fileId);
   }
 }
