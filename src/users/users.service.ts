@@ -1,6 +1,13 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilesService } from 'src/files/files.service';
+import { PrivateFilesService } from 'src/private-files/private-files.service';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/updateUserDto';
 import User from './user.entity';
@@ -10,6 +17,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private repo: Repository<User>,
     private readonly filesService: FilesService,
+    private readonly privateFilesService: PrivateFilesService,
   ) {}
 
   async getById(id: number) {
@@ -82,5 +90,55 @@ export class UsersService {
       });
     }
     await this.filesService.deletePublicFile(fileId);
+  }
+
+  async addPrivateFile(userId: number, imageBuffer: Buffer, filename: string) {
+    return this.privateFilesService.uploadPrivateFile(
+      imageBuffer,
+      userId,
+      filename,
+    );
+  }
+
+  async deletePrivateFile(userId: number, fileId: number) {
+    // const user = await this.getById(userId);
+    const file = await this.privateFilesService.getPrivateFile(fileId);
+    if (file.info.owner.id !== userId) {
+      throw new UnauthorizedException();
+    }
+    await this.privateFilesService.deletePrivateFile(fileId);
+  }
+
+  async getPrivateFile(userId: number, fileId: number) {
+    const file = await this.privateFilesService.getPrivateFile(fileId);
+    if (file.info.owner.id !== userId) {
+      throw new UnauthorizedException();
+    }
+    return file;
+  }
+
+  async getAllPrivateFiles(userId: number) {
+    const userWithFiles = await this.repo.findOne({
+      where: {
+        id: userId,
+      },
+      relations: {
+        files: true,
+      },
+    });
+    if (!userWithFiles) {
+      throw new NotFoundException('User with this id does not exist');
+    }
+    return Promise.all(
+      userWithFiles.files.map(async (file) => {
+        const url = await this.privateFilesService.generatePresignedUrl(
+          file.key,
+        );
+        return {
+          ...file,
+          url,
+        };
+      }),
+    );
   }
 }

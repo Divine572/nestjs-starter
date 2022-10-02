@@ -8,6 +8,9 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesController } from './categories/categories.controller';
 import { CategoriesModule } from './categories/categories.module';
 import { FilesModule } from './files/files.module';
+import { PrivateFilesService } from './private-files/private-files.service';
+import { PrivateFilesController } from './private-files/private-files.controller';
+import { PrivateFilesModule } from './private-files/private-files.module';
 
 @Module({
   imports: [
@@ -33,8 +36,9 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     CategoriesModule,
     FilesModule,
+    PrivateFilesModule,
   ],
-  controllers: [CategoriesController],
-  providers: [],
+  controllers: [CategoriesController, PrivateFilesController],
+  providers: [PrivateFilesService],
 })
 export class AppModule {}
